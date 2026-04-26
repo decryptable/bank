@@ -1,0 +1,94 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            suffix: linux-x64
+          - os: ubuntu-latest
+            platform: linux
+            arch: arm64
+            suffix: linux-arm64
+            cross: true
+          - os: macos-13
+            platform: macos
+            arch: x64
+            suffix: macos-x64
+          - os: macos-latest
+            platform: macos
+            arch: arm64
+            suffix: macos-arm64
+          - os: windows-latest
+            platform: windows
+            arch: x64
+            suffix: windows-x64
+            ext: .exe
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+        working-directory: bin
+
+      - name: Install cross-compile toolchain (Linux ARM64)
+        if: matrix.cross == true
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Compile (native)
+        if: matrix.cross != true
+        run: |
+          dart compile exe bin/main.dart -o dist/bank-${{ matrix.suffix }}${{ matrix.ext }}
+
+      - name: Compile (cross Linux ARM64)
+        if: matrix.cross == true
+        run: |
+          dart compile exe bin/main.dart \
+            --target-os linux \
+            -o dist/bank-${{ matrix.suffix }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bank-${{ matrix.suffix }}
+          path: dist/bank-${{ matrix.suffix }}${{ matrix.ext }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**
+          generate_release_notes: true

@@ -1,0 +1,12 @@
+name: bank
+description: Sistem Layanan Perbankan
+version: 1.0.0
+repository: https://github.com/decryptable/bank
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  interact_cli: ^2.4.0
+  tint: ^2.0.0
+  cli_util: ^0.4.0
