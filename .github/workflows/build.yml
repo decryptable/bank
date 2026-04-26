@@ -20,10 +20,10 @@ jobs:
             arch: arm64
             suffix: linux-arm64
             cross: true
-          - os: macos-13
-            platform: macos
-            arch: x64
-            suffix: macos-x64
+          - os: windows-latest
+            platform: windows
+            arch: arm64
+            suffix: windows-arm64
           - os: macos-latest
             platform: macos
             arch: arm64
@@ -50,7 +50,7 @@ jobs:
         working-directory: bin
 
       - name: Create dist directory
-        run: mkdir -p dist
+        run: if [ ! -d "dist" ]; then mkdir dist; fi
 
       - name: Install cross-compile toolchain (Linux ARM64)
         if: matrix.cross == true
