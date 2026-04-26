@@ -49,8 +49,13 @@ jobs:
         run: dart pub get
         working-directory: bin
 
-      - name: Create dist directory
+      - name: Create dist directory (UNIX)
+        if: runner.os != 'Windows'
         run: if [ ! -d "dist" ]; then mkdir dist; fi
+
+      - name: Create dist directory (Windows)
+        if: runner.os == 'Windows'
+        run: if not exist "dist" mkdir dist
 
       - name: Install cross-compile toolchain (Linux ARM64)
         if: matrix.cross == true
