@@ -51,10 +51,12 @@ jobs:
 
       - name: Create dist directory (UNIX)
         if: runner.os != 'Windows'
+        shell: bash
         run: if [ ! -d "dist" ]; then mkdir dist; fi
 
       - name: Create dist directory (Windows)
         if: runner.os == 'Windows'
+        shell: cmd
         run: if not exist "dist" mkdir dist
 
       - name: Install cross-compile toolchain (Linux ARM64)
