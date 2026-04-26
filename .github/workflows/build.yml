@@ -49,6 +49,9 @@ jobs:
         run: dart pub get
         working-directory: bin
 
+      - name: Create dist directory
+        run: mkdir -p dist
+
       - name: Install cross-compile toolchain (Linux ARM64)
         if: matrix.cross == true
         run: |
