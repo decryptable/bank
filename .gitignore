@@ -27,3 +27,8 @@ doc/api/
 
 .flutter-plugins
 .flutter-plugins-dependencies
+
+# etc
+scripts
+LAPORAN.md
+LAPORAN.gen.md
